@@ -7,7 +7,7 @@ import java.util.Random;
 // Gera os tripulantes usados na Grande Corrida.
 public class GeradorTripulantes {
 
-    private static final Random SORTEIO = new Random();
+    private static final Random SORTEIO = new Random(1990);
 
     // Partes para montar nomes aleatórios
     private static final String[] PRIMEIROS_NOMES = {"Zibo", "Quark", "Lumi", "Gloop", "Pixel", "Plim", "Fafá", "Orbi",

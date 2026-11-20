@@ -29,11 +29,11 @@ public class Formatador {
     public static void listarTripulantes(Tripulante[] vetor, int tamanho) {
         System.out.println();
         System.out.println(completar("Nº", 5) + completar("Código", 11) + completar("Nome", 25)
-                + completar("Planeta", 13) + "Função");
+                + completar("Planeta", 15) + "Função");
         System.out.println("-------------------------------------------------------------------------");
         for (int i = 0; i < tamanho; i++) {
             System.out.println(completar("" + (i + 1), 5) + completar("" + vetor[i].getCodigo(), 11)
-                    + completar(vetor[i].getNome(), 25) + completar(vetor[i].getPlaneta(), 13) + vetor[i].getFuncao());
+                    + completar(vetor[i].getNome(), 25) + completar(vetor[i].getPlaneta(), 15) + vetor[i].getFuncao());
         }
         System.out.println("Total: " + tamanho + " tripulantes");
     }

@@ -1,6 +1,8 @@
 package ui;
 
-import algoritmos.Algoritmo;
+import algoritmos.BubbleSort;
+import algoritmos.InsertionSort;
+import algoritmos.QuickSort;
 import dados.Estacao;
 import modelo.ResultadoOrdenacao;
 import modelo.Tripulante;
@@ -26,7 +28,7 @@ public class Telas {
     public static void mostrarMenu() {
         System.out.println();
         System.out.println("╔═══════════════════════════════════════════╗");
-        System.out.println("║             MISSÃO GALÁCTICA              ║");
+        System.out.println("║              MISSÃO GALÁCTICA             ║");
         System.out.println("╠═══════════════════════════════════════════╣");
         System.out.println("║ 1 - Registrar tripulante                  ║");
         System.out.println("║ 2 - Listar tripulantes                    ║");
@@ -84,16 +86,19 @@ public class Telas {
         Formatador.listarTripulantes(estacao.getVetor(), estacao.getQuantidade());
     }
 
-    // Devolve um algoritmo só, ou os três quando "Os três (comparar)" é escolhido.
-    public static Algoritmo[] escolherAlgoritmos(boolean permitirTodos) {
-        Algoritmo[] todos = Algoritmo.values();
-        for (int i = 0; i < todos.length; i++) {
-            System.out.println((i + 1) + " - " + todos[i].getNome());
-        }
+    // retorna 1 (Bubble), 2 (Insertion), 3 (Quick) ou 4 (os tres).
+    public static int escolherAlgoritmo(boolean permitirTodos) {
+        System.out.println("1 - Bubble Sort");
+        System.out.println("2 - Insertion Sort");
+        System.out.println("3 - Quick Sort");
         if (permitirTodos) {
             System.out.println("4 - Os três (comparar)");
         }
-        int maximo = permitirTodos ? todos.length + 1 : todos.length;
+
+        int maximo = 3;
+        if (permitirTodos) {
+            maximo = 4;
+        }
 
         int escolha;
         do {
@@ -103,28 +108,49 @@ public class Telas {
             }
         } while (escolha < 1 || escolha > maximo);
 
-        if (permitirTodos && escolha == maximo) {
-            return todos;
-        }
-        return new Algoritmo[]{todos[escolha - 1]};
+        return escolha;
     }
 
-    // OPÇÃO 3 - ORGANIZAR EMBARQUE NA CÁPSULA
+    // Opção 3 - Organizar embarque
     public static void organizarEmbarque(Estacao estacao) {
         int quantidade = estacao.getQuantidade();
         if (quantidade == 0) {
             System.out.println("Nenhum tripulante registrado!");
             return;
         }
-        Algoritmo[] algoritmos = escolherAlgoritmos(true);
-        Tripulante[] ordenado = null;
 
+        int escolha = escolherAlgoritmo(true);
+        int inicio = escolha;
+        int fim = escolha;
+        if (escolha == 4) {
+            inicio = 1;
+            fim = 3;
+        }
+
+        Tripulante[] ordenado = null;
         System.out.println();
-        for (Algoritmo algoritmo : algoritmos) {
+
+        //Copia para cada algoritmo pra ser justa a comparação
+        for (int alg = inicio; alg <= fim; alg++) {
             Tripulante[] copia = estacao.copiar(quantidade);
-            ResultadoOrdenacao resultado = algoritmo.ordenar(copia, quantidade, false);
-            System.out.println(Formatador.completar(algoritmo.getNome(), 15) + " → comparações: "
-                    + resultado.comparacoes + " | " + algoritmo.getNomeContador() + ": " + resultado.trocas);
+            ResultadoOrdenacao resultado;
+            String nomeAlg;
+            String nomeCont = "trocas";
+
+            if (alg == 1) {
+                nomeAlg = "Bubble Sort";
+                resultado = BubbleSort.ordenar(copia, quantidade, false);
+            } else if (alg == 2) {
+                nomeAlg = "Insertion Sort";
+                nomeCont = "deslocamentos";
+                resultado = InsertionSort.ordenar(copia, quantidade, false);
+            } else {
+                nomeAlg = "Quick Sort";
+                resultado = QuickSort.ordenar(copia, quantidade, false);
+            }
+
+            System.out.println(Formatador.completar(nomeAlg, 15) + " → comparações: "
+                    + resultado.comparacoes + " | " + nomeCont + ": " + resultado.trocas);
             ordenado = copia;
         }
 
@@ -133,20 +159,22 @@ public class Telas {
         Formatador.listarTripulantes(ordenado, quantidade);
     }
 
-    // OPÇÃO 4 - MODO PASSO A PASSO (até 10 tripulantes)
+    // Opção 4 - passo a passo (10 trip max)
     public static void modoPassoAPasso(Estacao estacao) {
         int quantidade = estacao.getQuantidade();
         if (quantidade == 0) {
             System.out.println("Nenhum tripulante registrado!");
             return;
         }
+
+        //10 tripulantes máximo
         int tamanho = quantidade;
         if (tamanho > 10) {
             tamanho = 10;
             System.out.println("A cápsula de treino tem 10 assentos: embarcam os 10 primeiros da lista.");
         }
 
-        Algoritmo algoritmo = escolherAlgoritmos(false)[0];
+        int escolha = escolherAlgoritmo(false);
         Tripulante[] copia = estacao.copiar(tamanho);
 
         System.out.println();
@@ -155,10 +183,22 @@ public class Telas {
             System.out.println("  " + (i + 1) + ". " + copia[i].descricao());
         }
 
-        ResultadoOrdenacao resultado = algoritmo.ordenar(copia, tamanho, true);
+        //true no ultimo parametro pra imprimir a comparação
+        ResultadoOrdenacao resultado;
+        String nomeAlg;
+        if (escolha == 1) {
+            nomeAlg = "Bubble Sort";
+            resultado = BubbleSort.ordenar(copia, tamanho, true);
+        } else if (escolha == 2) {
+            nomeAlg = "Insertion Sort";
+            resultado = InsertionSort.ordenar(copia, tamanho, true);
+        } else {
+            nomeAlg = "Quick Sort";
+            resultado = QuickSort.ordenar(copia, tamanho, true);
+        }
 
         System.out.println();
-        System.out.println("=== " + algoritmo.getNome() + " terminou! ===");
+        System.out.println("=== " + nomeAlg + " terminou! ===");
         System.out.println("Total → comparações: " + resultado.comparacoes + " | trocas: " + resultado.trocas);
         System.out.println("Fila final da cápsula:");
         for (int i = 0; i < tamanho; i++) {

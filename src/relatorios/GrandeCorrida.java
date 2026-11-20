@@ -1,18 +1,19 @@
 package relatorios;
 
-import algoritmos.Algoritmo;
+import algoritmos.BubbleSort;
+import algoritmos.InsertionSort;
+import algoritmos.QuickSort;
 import dados.GeradorTripulantes;
 import modelo.ResultadoOrdenacao;
 import modelo.Tripulante;
 import ui.Formatador;
-
-import java.util.Arrays;
 
 // Compara os três algoritmos em três tamanhos e três situações.
 public class GrandeCorrida {
 
     private static final int[] TAMANHOS = {50, 1000, 10000};
     private static final String[] SITUACOES = {"Aleatório", "Já ordenado", "Ordem inversa"};
+    private static final String[] NOMES_ALGORITMOS = {"Bubble Sort", "Insertion Sort", "Quick Sort"};
     private static final int[] CODIGOS_SITUACAO = {
             GeradorTripulantes.ALEATORIO,
             GeradorTripulantes.JA_ORDENADO,
@@ -22,80 +23,95 @@ public class GrandeCorrida {
     private GrandeCorrida() {
     }
 
+    // Roda os 3 algoritmos sobre cópias iguais para cada tamanho e situação,
+    // medindo tempo (ms), comparações e trocas, e depois imprime as tabelas.
     public static void executar() {
-        // linha = algoritmo * 3 + situação (9 linhas, como na tabela do enunciado)
-        // coluna = tamanho (n = 50, 1.000, 10.000)
-        double[][] tempos = new double[9][3];
-        int[][] tabelaComparacoes = new int[9][3];
-        int[][] tabelaTrocas = new int[9][3];
-        Algoritmo[] algoritmos = Algoritmo.values();
+        // Vetores 1D de 27 posições (9 linhas x 3 tamanhos) no lugar de matrizes 2D.
+        double[] tempos = new double[27];
+        int[] tabelaComparacoes = new int[27];
+        int[] tabelaTrocas = new int[27];
 
         System.out.println();
         System.out.println("A Grande Corrida vai começar!");
 
         for (int t = 0; t < TAMANHOS.length; t++) {
             for (int s = 0; s < SITUACOES.length; s++) {
-                // os três algoritmos correm com os MESMOS dados (cada um com sua cópia)
+                // Os três algoritmos correm com os mesmos dados (cada um recebe sua cópia).
                 Tripulante[] base = GeradorTripulantes.gerar(TAMANHOS[t], CODIGOS_SITUACAO[s]);
 
-                for (Algoritmo algoritmo : algoritmos) {
-                    Tripulante[] copia = Arrays.copyOf(base, TAMANHOS[t]);
+                // 0 = Bubble Sort, 1 = Insertion Sort, 2 = Quick Sort
+                for (int a = 0; a < 3; a++) {
+                    Tripulante[] copia = copiar(base, TAMANHOS[t]);
 
                     long inicio = System.nanoTime();
-                    ResultadoOrdenacao resultado = algoritmo.ordenar(copia, TAMANHOS[t], false);
+                    ResultadoOrdenacao resultado;
+                    if (a == 0) {
+                        resultado = BubbleSort.ordenar(copia, TAMANHOS[t], false);
+                    } else if (a == 1) {
+                        resultado = InsertionSort.ordenar(copia, TAMANHOS[t], false);
+                    } else {
+                        resultado = QuickSort.ordenar(copia, TAMANHOS[t], false);
+                    }
                     long fim = System.nanoTime();
 
-                    int linha = algoritmo.ordinal() * 3 + s;
-                    tempos[linha][t] = (fim - inicio) / 1000000.0; // nanossegundos → milissegundos
-                    tabelaComparacoes[linha][t] = resultado.comparacoes;
-                    tabelaTrocas[linha][t] = resultado.trocas;
+                    // Mapeia (algoritmo, situação, tamanho) para uma posição única de 0 a 26.
+                    int linha = a * 3 + s;
+                    int pos = linha * 3 + t;
+                    tempos[pos] = (fim - inicio) / 1000000.0; // nanossegundos → milissegundos
+                    tabelaComparacoes[pos] = resultado.comparacoes;
+                    tabelaTrocas[pos] = resultado.trocas;
                 }
             }
             System.out.println("  n = " + TAMANHOS[t] + " concluído!");
         }
 
-        // Tabela de tempos
         System.out.println();
         System.out.println("TEMPO (ms)");
-        imprimirTabelas(tempos, tabelaComparacoes, tabelaTrocas, algoritmos);
+        imprimirTabelas(tempos, tabelaComparacoes, tabelaTrocas);
     }
 
-    private static void imprimirTabelas(double[][] tempos, int[][] comparacoes, int[][] trocas,
-                                        Algoritmo[] algoritmos) {
+    // Cria um novo vetor com os primeiros "tamanho" elementos
+    private static Tripulante[] copiar(Tripulante[] original, int tamanho) {
+        Tripulante[] copia = new Tripulante[tamanho];
+        for (int i = 0; i < tamanho; i++) {
+            copia[i] = original[i];
+        }
+        return copia;
+    }
+
+    // Formata e exibe no console as três tabelas finais: tempo, comparações e trocas.
+    private static void imprimirTabelas(double[] tempos, int[] comparacoes, int[] trocas) {
         Formatador.imprimirCabecalho();
         for (int linha = 0; linha < 9; linha++) {
-            System.out.print(Formatador.completar(algoritmos[linha / 3].getNome(), 17)
+            System.out.print(Formatador.completar(NOMES_ALGORITMOS[linha / 3], 17)
                     + Formatador.completar(SITUACOES[linha % 3], 16));
             for (int t = 0; t < 3; t++) {
-                // arredonda para 3 casas depois da vírgula
-                double tempoArredondado = Math.round(tempos[linha][t] * 1000) / 1000.0;
+                double tempoArredondado = Math.round(tempos[linha * 3 + t] * 1000) / 1000.0;
                 System.out.print(Formatador.completar("" + tempoArredondado, 15));
             }
             System.out.println();
         }
 
-        // Tabela de comparações
         System.out.println();
         System.out.println("COMPARAÇÕES");
         Formatador.imprimirCabecalho();
         for (int linha = 0; linha < 9; linha++) {
-            System.out.print(Formatador.completar(algoritmos[linha / 3].getNome(), 17)
+            System.out.print(Formatador.completar(NOMES_ALGORITMOS[linha / 3], 17)
                     + Formatador.completar(SITUACOES[linha % 3], 16));
             for (int t = 0; t < 3; t++) {
-                System.out.print(Formatador.completar("" + comparacoes[linha][t], 15));
+                System.out.print(Formatador.completar("" + comparacoes[linha * 3 + t], 15));
             }
             System.out.println();
         }
 
-        // Tabela de trocas
         System.out.println();
         System.out.println("TROCAS (deslocamentos no Insertion Sort)");
         Formatador.imprimirCabecalho();
         for (int linha = 0; linha < 9; linha++) {
-            System.out.print(Formatador.completar(algoritmos[linha / 3].getNome(), 17)
+            System.out.print(Formatador.completar(NOMES_ALGORITMOS[linha / 3], 17)
                     + Formatador.completar(SITUACOES[linha % 3], 16));
             for (int t = 0; t < 3; t++) {
-                System.out.print(Formatador.completar("" + trocas[linha][t], 15));
+                System.out.print(Formatador.completar("" + trocas[linha * 3 + t], 15));
             }
             System.out.println();
         }

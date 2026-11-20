@@ -4,7 +4,7 @@ import modelo.ResultadoOrdenacao;
 import modelo.Tripulante;
 import ui.Formatador;
 
-// Ordena a tripulação pelo código galáctico usando Bubble Sort.
+// Ordena a tripulação pelo código galáctico usando Bubble Sort (sem critério de parada).
 public class BubbleSort {
 
     public static ResultadoOrdenacao ordenar(Tripulante[] vetor, int tamanho, boolean passoAPasso) {
@@ -12,10 +12,9 @@ public class BubbleSort {
         int trocas = 0;
         Tripulante temp;
 
-        for (int i = 0; i < tamanho - 1; i++) {
-            boolean houveTroca = false;
-
-            if (passoAPasso) {
+        // Mantém i < tamanho conforme o slide 5; na última iteração o laço interno não executa.
+        for (int i = 0; i < tamanho; i++) {
+            if (passoAPasso && i < tamanho - 1) {
                 System.out.println();
                 System.out.println("★ Bubble Sort · passagem " + (i + 1));
             }
@@ -32,7 +31,6 @@ public class BubbleSort {
                     vetor[j - 1] = vetor[j];
                     vetor[j] = temp;
                     trocas++;
-                    houveTroca = true;
                 } else {
                     if (passoAPasso) {
                         System.out.println(vetor[j - 1].descricao() + " > " + vetor[j].descricao()
@@ -41,18 +39,10 @@ public class BubbleSort {
                 }
             }
 
-            if (passoAPasso) {
+            if (passoAPasso && i < tamanho - 1) {
                 System.out.println("fim da passagem " + (i + 1) + " → comparações: " + comparacoes
                         + " | trocas: " + trocas);
                 Formatador.mostrarFila(vetor, tamanho);
-            }
-
-            // critério de parada
-            if (!houveTroca) {
-                if (passoAPasso) {
-                    System.out.println("Nenhuma troca nesta passagem → todos já estão em ordem!");
-                }
-                break;
             }
         }
 
