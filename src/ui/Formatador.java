@@ -17,6 +17,15 @@ public class Formatador {
         return texto;
     }
 
+    // Mostra a fila da cápsula (só os códigos), usada no passo a passo.
+    public static void mostrarFila(Tripulante[] vetor, int tamanho) {
+        System.out.print("   Fila da cápsula: ");
+        for (int i = 0; i < tamanho; i++) {
+            System.out.print(vetor[i].getCodigo() + " ");
+        }
+        System.out.println();
+    }
+
     public static void listarTripulantes(Tripulante[] vetor, int tamanho) {
         System.out.println();
         System.out.println(completar("Nº", 5) + completar("Código", 11) + completar("Nome", 25)

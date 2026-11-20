@@ -2,6 +2,7 @@ package algoritmos;
 
 import modelo.ResultadoOrdenacao;
 import modelo.Tripulante;
+import ui.Formatador;
 
 // Ordena a tripulação pelo código galáctico usando Insertion Sort.
 public class InsertionSort {
@@ -47,19 +48,10 @@ public class InsertionSort {
             if (passoAPasso) {
                 System.out.println(chave.getNome() + " senta na poltrona " + (j + 2)
                         + " → comparações: " + comparacoes + " | deslocamentos: " + trocas);
-                mostrarFila(vetor, tamanho);
+                Formatador.mostrarFila(vetor, tamanho);
             }
         }
 
         return new ResultadoOrdenacao(comparacoes, trocas);
-    }
-
-    // Mostra a fila da cápsula (só os códigos), usada no passo a passo.
-    private static void mostrarFila(Tripulante[] vetor, int tamanho) {
-        System.out.print("   Fila da cápsula: ");
-        for (int i = 0; i < tamanho; i++) {
-            System.out.print(vetor[i].getCodigo() + " ");
-        }
-        System.out.println();
     }
 }

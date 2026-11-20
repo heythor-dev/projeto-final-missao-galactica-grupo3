@@ -2,6 +2,7 @@ package algoritmos;
 
 import modelo.ResultadoOrdenacao;
 import modelo.Tripulante;
+import ui.Formatador;
 
 // Ordena a tripulação pelo código galáctico usando Bubble Sort.
 public class BubbleSort {
@@ -43,7 +44,7 @@ public class BubbleSort {
             if (passoAPasso) {
                 System.out.println("fim da passagem " + (i + 1) + " → comparações: " + comparacoes
                         + " | trocas: " + trocas);
-                mostrarFila(vetor, tamanho);
+                Formatador.mostrarFila(vetor, tamanho);
             }
 
             // critério de parada
@@ -56,14 +57,5 @@ public class BubbleSort {
         }
 
         return new ResultadoOrdenacao(comparacoes, trocas);
-    }
-
-    // Mostra a fila da cápsula (só os códigos), usada no passo a passo.
-    private static void mostrarFila(Tripulante[] vetor, int tamanho) {
-        System.out.print("   Fila da cápsula: ");
-        for (int i = 0; i < tamanho; i++) {
-            System.out.print(vetor[i].getCodigo() + " ");
-        }
-        System.out.println();
     }
 }

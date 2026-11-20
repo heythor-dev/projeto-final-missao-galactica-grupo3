@@ -5,7 +5,6 @@ import dados.Estacao;
 import modelo.ResultadoOrdenacao;
 import modelo.Tripulante;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 // Tudo o que aparece na tela e tudo o que o usuário digita.
